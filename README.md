@@ -18,10 +18,10 @@ Usage:
     $ # {"urls": ["<url1>", "<url2>"]}
     $ curl -i -H "Content-Type: application/json" -X POST -d '{"urls": ["https://raw.githubusercontent.com/easylist/easylistgermany/master/easylistgermany/easylistgermany_adservers.txt"]}' http://localhost:5002/api/v1/event
 
-This will create 3 files in the folder from where script is called: 
-    <date>_<time>_fragments.txt - a file consisting of fragments of urls you passed in request
-    <date>_<time>_list.txt - raw text ABP filters file
-    <date>_<time>_list.csv - ABP filters in CSV format
+This will create three files in the folder from where script is called: 
+* %date%_%time%_fragments.txt - a file consisting of fragments of urls you passed in request
+* \<date>_<time>_list.txt - raw text ABP filters file
+* <date>_<time>_list.csv - ABP filters in CSV format
 
 API will return download link for CSV formatted filter file, usable for analytical processing (currently with only 4 fields: text, action, selector, options).
 
