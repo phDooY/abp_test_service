@@ -61,7 +61,7 @@ def receive_event():
     with open(csv_file_name, "wb") as csv_file:
         writer = csv.writer(csv_file, delimiter=';')
         writer.writerow(['<header_placeholder>'])
-        csv_header = ['text', 'action', 'selector', 'options']
+        csv_header = ['text', 'action'] # , 'selector', 'options']
 
         with open(list_file_name) as list_file:
             list_iterator = parse_filterlist(list_file)
@@ -69,12 +69,16 @@ def receive_event():
                 # skip non-Filters
                 if not 'abp.filters.parser.Filter' in str(type(i)):
                     continue
-                #text = i.text if i.text else ''
-                #action = i.action if i.action else ''
-                #selector = i.selector if i.selector else ''
-                #options = i.options if i.options else ''
+
                 try:
-                    row = [i.text, i.action, json.dumps(i.selector), json.dumps(i.options)]
+                    json_row = {
+                      'text': i.text,
+                      'action': i.action,
+                      'selector': i.selector,
+                      'options': i.options
+                      }
+                    row, csv_header = _parse_csv_row(json_row, csv_header)
+
                     writer.writerow(row)
                 except UnicodeEncodeError:
                     print 'broken row:'
@@ -85,9 +89,43 @@ def receive_event():
     call(["sed", "-i", "s/<header_placeholder>/{}/g".format(';'.join(csv_header)), csv_file_name])
     #
     # 
-
-
     return make_response(jsonify({'success': 'download your file from http://'}), 200)
+
+
+def _parse_csv_row(json_row, header):
+    flat_json_row = _flatten_json(json_row)
+    fields = flat_json_row.keys()
+
+    # append newly discovered fields into the header
+    new_fields = set(fields) - set(header)
+    if new_fields:
+        for i in new_fields:
+            header.append(i)
+
+    # prepare final row
+    list_row = [None] * len(header)
+    for key in fields:
+        list_row[header.index(key)] = flat_json_row[key]
+
+    return list_row, header
+
+
+# taken from https://medium.com/towards-data-science/flattening-json-objects-in-python-f5343c794b10
+def _flatten_json(y):
+    out = {}
+    def flatten(x, name=''):
+        if type(x) is dict:
+            for a in x:
+                flatten(x[a], name + a + '_')
+        #elif type(x) is list:
+        #    i = 0
+        #    for a in x:
+        #        flatten(a, name + str(i) + '_')
+        #        i += 1
+        else:
+            out[name[:-1]] = x
+    flatten(y)
+    return out
 
 if __name__ == '__main__':
     log_handler = logging.StreamHandler(sys.stdout)
