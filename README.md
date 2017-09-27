@@ -29,7 +29,7 @@ API will return download link for CSV formatted filter file, usable for analytic
 Further developments
 ===========
 
-* Add method to parse Filter object, and detect fields, and apped them to CSV file on the go.
+* Add method to parse Filter object, and detect fields, and apped them to CSV file on the go. ✓
 * Accept text filter files as well, not only URLs.
 * Take care of various maintenance questions, e.g. if files need to be archived, how to keep cache of requests, and in general keep service neat and self efficient.
 * Ideally there should be database fired up, where requests can be saved.
